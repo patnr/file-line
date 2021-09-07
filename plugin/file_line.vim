@@ -1,6 +1,10 @@
 if exists('g:loaded_file_line') | finish | endif
 let g:loaded_file_line = 1
 
+" Options
+let g:file_line_crosshairs = get(g:, 'file_line_crosshairs', 1)
+let g:file_line_fallback_column0 = get(g:, 'file_line_fallback_column0', 1)
+
 augroup file_line
   autocmd!
   autocmd! BufNewFile * nested call s:goto_file_line()
@@ -19,9 +23,12 @@ function! s:goto_file_line(...)
         \ '\(.\{-1,}\)[(:]\(\d\+\)\%(:\(\d\+\):\?\)\?')
   if empty(matches) | return file_line_col | endif
 
+  " Fallback column
+  let c0 = g:file_line_fallback_column0 ? '0|' : '^'
+
   let fname = matches[1]
   let line  = matches[2] ==# '' ? '0' : matches[2]
-  let col   = matches[3] ==# '' ? '0' : matches[3]
+  let col   = matches[3] ==# '' ? c0  : matches[3].'|'
 
   if filereadable(fname)
     let bufnr = bufnr('%')
@@ -29,7 +36,7 @@ function! s:goto_file_line(...)
     exec 'bwipeout ' bufnr
 
     exec line
-    exec 'normal! ' . col . '|'
+    exec 'normal! ' . col
     normal! zv
     normal! zz
     filetype detect
@@ -45,7 +52,6 @@ endfunction
 " in which case it will not get centered.
 " Ref1: https://vi.stackexchange.com/a/3481/29697
 " Ref2: https://stackoverflow.com/a/33775128/38281
-let g:file_line_crosshairs = get(g:, 'file_line_crosshairs', 1)
 function! s:crosshair_flash(n) abort
   if g:file_line_crosshairs
     " Store settings
