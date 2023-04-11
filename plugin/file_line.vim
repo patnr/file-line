@@ -36,11 +36,12 @@ function! s:goto_file_line(...)
 
   if filereadable(fname)
     let bufnr = bufnr('%')
-    execute 'keepalt edit ' . fnameescape(fname)
-    execute 'bwipeout ' bufnr
+    execute 'keepalt edit' fnameescape(fname)
+    execute 'bdelete' bufnr
 
     execute line
-    execute 'normal! ' . col
+    execute 'normal!' col
+    normal! m"
     normal! zv
     normal! zz
     filetype detect
