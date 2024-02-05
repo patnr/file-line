@@ -75,3 +75,6 @@ function! s:crosshair_flash(n, d) abort
   let &cursorline = l:cul
   let &cursorcolumn = l:cuc
 endfunction
+
+" Create command with 2 args to enable outside use of flash
+command! -nargs=+ FlashCursor call s:crosshair_flash(<f-args>)
